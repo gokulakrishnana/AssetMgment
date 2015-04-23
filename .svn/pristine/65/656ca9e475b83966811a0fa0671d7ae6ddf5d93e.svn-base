@@ -1,0 +1,54 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Bill Generation Response</title>
+<link rel="stylesheet" type="text/css" href="stylesheets/weblayout.css"/>
+<script type="text/javascript" src="scripts/jquery.js"></script>
+<style type="text/css">
+.replyfromserver{
+position:relative;
+background-color:#D1F0F9;
+left:25%;
+width:20%;
+border-style:solid;
+border-width:2px;
+border-color:#D1F0F9;
+padding:2%;
+}
+</style>
+</head>
+<body>
+
+<div id="header">
+<h1>Bill Generation Response</h1>
+</div>
+
+<div id="nav">
+<a href="index.html">Home</a><br>
+<a href="AddAssetScr.jsp">Add Asset</a><br>
+<a href="GetFreeAssets">Add Lease </a><br>
+<a href="GetDeedBillGenerate">Bill Summary</a><br>
+</div>
+<div id="section">
+ <%String returncode = (String) session.getAttribute("returncode");
+if(returncode == "fail")
+{
+%>
+			"Query Failed; try again"
+<% }
+else if (returncode == "pass"){ %>
+	"Query executed sucessfully."
+	<%
+}else{
+	out.println(" ");
+}
+%> 
+</div>
+
+<div id="end">
+</div>
+</body>
+</html>

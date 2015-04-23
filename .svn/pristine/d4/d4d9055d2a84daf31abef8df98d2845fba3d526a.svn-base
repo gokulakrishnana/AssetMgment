@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>AssetMgment</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  <servlet>
+  	<servlet-name>AddAssetScr</servlet-name>
+  	<jsp-file>/AddAssetScr.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>AddAssetScr</servlet-name>
+  	<url-pattern>/AddAssetScr.jsp</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+ 	 <servlet-name>GetFreeAssets</servlet-name>
+  	<servlet-class>org.gk.assetmgment.servlet.GetFreeAssets</servlet-class>
+  </servlet>
+  
+  <servlet>
+  	<servlet-name>GetDeedBillGenerate</servlet-name>
+  	<servlet-class>org.gk.assetmgment.servlet.GetDeedBillGenerate</servlet-class>
+  </servlet>
+</web-app>

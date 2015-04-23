@@ -1,0 +1,112 @@
+package org.gk.assetmgment.servlet;
+
+import java.io.IOException;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet(
+		description = "Gets active lease deeds for bill generation", 
+		urlPatterns = { 
+				"/GetDeedBillGenerate", 
+				"/getdeedbillgenerate"
+		})
+public class GetDeedBillGenerate extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	
+    private String driver = "com.mysql.jdbc.Driver";
+    private String url = "jdbc:mysql://localhost/test_assetmgnt";
+    private String User = "root";
+    private String Password = "";
+    java.sql.Connection conn = null;
+    private List<String> ls_activeDeedAsset = new ArrayList<String>();
+   
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		// Clear the list before loading
+		ls_activeDeedAsset.clear();
+		
+		try {
+			Class.forName(driver);
+		} catch (ClassNotFoundException e1) {
+			System.out.println("Driver classes not found??");
+			e1.printStackTrace();
+		}
+		
+		try {
+			conn = DriverManager.getConnection(url,User,Password);
+		} catch (SQLException e) {
+			System.out.println("Error while trying to get MySql Connection omg");
+			e.printStackTrace();
+		}
+		 
+		//Populate active deeds
+		getActiveLeaseDeed();
+		
+		//set session attribute and pass it to frontend
+		request.getSession().removeAttribute("activedeeds");
+		request.getSession().setAttribute("activedeeds", ls_activeDeedAsset);
+
+		//Set Request Dispatcher
+		RequestDispatcher distpatch = request.getRequestDispatcher("BillSummary.jsp");
+		distpatch.forward(request, response);
+	}
+
+	public void getActiveLeaseDeed(){
+		java.sql.PreparedStatement prepselectactivedeeds = null;
+		ResultSet selectactivedeeds_rs;
+		String selectactivedeeds = "select A.DEEDID ,B.ASSETID ,C.ASSETNAME ,C.ASSETST ,C.ASSETUNIT ,"
+				                 + "A.LEASEDEED ,A.STDATE ,A.ENDDATE ,A.LEASEAMT ,A.TENANT1 "
+				                 + "FROM leasedeed A"
+				                 +     ",assetdeedref B"
+				                 +     ",assetdetails C "
+				                 + "where A.ENDDATE >= CURDATE() "
+				                 + "  and A.DEEDID = B.DEEDID "
+				                 + "  and B.ASSETID = C.ASSETID";
+		try {
+			prepselectactivedeeds = conn.prepareStatement(selectactivedeeds, Statement.RETURN_GENERATED_KEYS);
+			
+		} catch (SQLException e) {
+			System.out.println("Error while preparing selectactivedeeds query");
+			e.printStackTrace();
+		}
+		
+		try {
+			selectactivedeeds_rs = prepselectactivedeeds.executeQuery();
+			while(selectactivedeeds_rs.next()){	
+				String temp_activdeedasset = (selectactivedeeds_rs.getInt(1)+ "," +
+						selectactivedeeds_rs.getInt(2)+ "," +                      
+						selectactivedeeds_rs.getString(3)+ "," +
+						selectactivedeeds_rs.getString(4)+ "," +
+						selectactivedeeds_rs.getInt(5)+ "," +
+						selectactivedeeds_rs.getString(6)+ "," +
+						selectactivedeeds_rs.getDate(7)+ "," +
+						selectactivedeeds_rs.getDate(8) + "," +
+						selectactivedeeds_rs.getDouble(9) + "," +
+						selectactivedeeds_rs.getString(10));
+						                      
+				ls_activeDeedAsset.add(temp_activdeedasset);
+				System.out.println(temp_activdeedasset);
+				
+			}
+		} catch (SQLException e) {
+			System.err.println("Error while executing selectactivedeeds query");
+			e.printStackTrace();
+		}		 
+	}
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	}
+
+}

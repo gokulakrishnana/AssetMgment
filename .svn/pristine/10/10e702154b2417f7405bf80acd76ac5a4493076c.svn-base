@@ -1,0 +1,93 @@
+-- phpMyAdmin SQL Dump
+-- version 4.1.14
+-- http://www.phpmyadmin.net
+--
+--
+-- Database: `assetmgnt`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `assetdeedref`
+--
+
+CREATE TABLE IF NOT EXISTS `assetdeedref` (
+  `REFID` int(11) NOT NULL AUTO_INCREMENT,
+  `DEEDID` int(11) NOT NULL,
+  `ASSETID` int(11) NOT NULL,
+  PRIMARY KEY (`REFID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `assetdetails`
+--
+
+CREATE TABLE IF NOT EXISTS `assetdetails` (
+  `ASSETID` int(11) NOT NULL AUTO_INCREMENT,
+  `ASSETNAME` text NOT NULL,
+  `ASSETST` text NOT NULL,
+  `ASSETUNIT` int(11) NOT NULL,
+  `ASSETADD1` varchar(250) NOT NULL,
+  `ASSETADD2` varchar(250) NOT NULL,
+  `ASSETPINCODE` int(11) NOT NULL,
+  `ASSETDOORNUM` text NOT NULL,
+  `InsTS` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ASSETID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=20 ;
+
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `billsummary`
+--
+
+CREATE TABLE IF NOT EXISTS `billsummary` (
+  `BILLID` int(11) NOT NULL AUTO_INCREMENT,
+  `LEASEID` int(11) NOT NULL,
+  `LEASEDEED` text NOT NULL,
+  `BILLGENDT` date NOT NULL,
+  `BILLMONTH` text NOT NULL,
+  `LEASEAMT` double(10,0) NOT NULL,
+  `ELECTRICITY` double NOT NULL,
+  `WATER` double NOT NULL,
+  `MISC1` double NOT NULL,
+  `MISC1COM` text NOT NULL,
+  `MISC2` double NOT NULL,
+  `MISC2COM` text NOT NULL,
+  `MISC3` double NOT NULL,
+  `MISC3COM` text NOT NULL,
+  `FINE` double NOT NULL,
+  `FINECOM` text NOT NULL,
+  `TOTAL` double NOT NULL,
+  `PAIDSTATUS` text NOT NULL,
+  PRIMARY KEY (`BILLID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `leasedeed`
+--
+
+CREATE TABLE IF NOT EXISTS `leasedeed` (
+  `DEEDID` int(11) NOT NULL AUTO_INCREMENT,
+  `LEASEDEED` text NOT NULL,
+  `STDATE` date NOT NULL,
+  `ENDDATE` date NOT NULL,
+  `TERMDATE` date NOT NULL,
+  `LEASEAMT` double(10,0) NOT NULL,
+  `TENANT1` text NOT NULL,
+  `TENANT2` text NOT NULL,
+  `TENANT3` text NOT NULL,
+  `OWNER` text NOT NULL,
+  `STATUS` text NOT NULL,
+  `INSTS` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `UPDTS` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`DEEDID`),
+  FULLTEXT KEY `LEASEDEED` (`LEASEDEED`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
+

@@ -1,0 +1,120 @@
+package org.gk.assetmgment.servlet;
+
+import java.io.IOException;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Calendar;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.websocket.Session;
+
+import org.gk.assetmgment.dto.Billsummary;
+
+import com.mysql.jdbc.PreparedStatement;
+
+@WebServlet({ "/AddBillDetails", "/addbilldetails" })
+public class AddBillDetails extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+    private String driver = "com.mysql.jdbc.Driver";
+    private String url = "jdbc:mysql://localhost/assetmgnt";
+    private String User = "root";
+    private String Password = "";
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	   
+		java.sql.Connection conn = null;
+		PreparedStatement prepstm =null;		
+		Billsummary billDt = new Billsummary();
+		RequestDispatcher distpatch = request.getRequestDispatcher("BillSummaryResponse.jsp");
+		
+		billDt.setLeaseId(Integer.parseInt(request.getParameter("leaseId")));
+		billDt.setLeaseDeed(request.getParameter("leaseNumber"));
+		billDt.setBillMonth(request.getParameter("billingMonth"));
+		billDt.setLeaseAmt(Double.parseDouble(request.getParameter("leaseAmt")));;
+		billDt.setElectricityCharge(Double.parseDouble(request.getParameter("elecAmt")));
+		billDt.setWaterCharge(Double.parseDouble(request.getParameter("waterCharge")));
+		billDt.setMiscCharge1(Double.parseDouble(request.getParameter("misc1ChargeAmt")));
+		billDt.setMiscCharge1comm(request.getParameter("misc1ChargeComm"));
+		billDt.setMiscCharge2(Double.parseDouble(request.getParameter("misc2ChargeAmt")));
+		billDt.setMiscCharge2comm(request.getParameter("misc2ChargeComm"));		
+		billDt.setMiscCharge3(Double.parseDouble(request.getParameter("misc3ChargeAmt")));
+		billDt.setMiscCharge3comm(request.getParameter("misc3ChargeComm"));
+		billDt.setFineAmt(Double.parseDouble(request.getParameter("fineChargeAmt")));		
+		billDt.setFineAmtcomm(request.getParameter("fineChargeComm"));
+		billDt.setBillDate(request.getParameter("billingDate"));
+		billDt.setPaidStatus(" ");
+		
+		//System.out.println("The total amount is  : " + billDt.getTotalAmt());
+
+		try {
+			Class.forName(driver);
+		} catch (ClassNotFoundException e) {
+			System.out.println("Not abl to find MYSQL Drivers");
+			e.printStackTrace();
+		}
+		
+		try {
+			conn = DriverManager.getConnection(url, User, Password);
+		} catch (SQLException e) {
+			System.out.println("Not abl to get Connected to MYSQL");
+			e.printStackTrace();
+		}
+		String insertquery = "INSERT INTO billsummary"
+				+ "( LEASEID, LEASEDEED, BILLGENDT, BILLMONTH, LEASEAMT, "
+				+ "ELECTRICITY, WATER, MISC1, MISC1COM, MISC2,"
+				+ " MISC2COM, MISC3, MISC3COM, FINE, FINECOM,"
+				+ " TOTAL, PAIDSTATUS) "
+				+ "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		try {
+			prepstm = (PreparedStatement) conn.prepareStatement(insertquery);
+			
+			//Populating the sql fields
+			prepstm.setInt(1, billDt.getLeaseId());
+			prepstm.setString(2, billDt.getLeaseDeed());
+			prepstm.setString(3, billDt.getBillDate());  
+			prepstm.setString(4, billDt.getBillMonth());
+			prepstm.setDouble(5, billDt.getLeaseAmt());
+			prepstm.setDouble(6, billDt.getElectricityCharge());
+			prepstm.setDouble(7, billDt.getWaterCharge());
+			prepstm.setDouble(8, billDt.getMiscCharge1());
+			prepstm.setString(9, billDt.getMiscCharge1comm());
+			prepstm.setDouble(10, billDt.getMiscCharge2());
+			prepstm.setString(11,billDt.getMiscCharge2comm());
+			prepstm.setDouble(12, billDt.getMiscCharge3());
+			prepstm.setString(13, billDt.getMiscCharge3comm());
+			prepstm.setDouble(14, billDt.getFineAmt());
+			prepstm.setString(15, billDt.getFineAmtcomm());
+			prepstm.setDouble(16,billDt.getTotalAmt());
+			prepstm.setString(17,billDt.getPaidStatus());
+		} catch (SQLException e) {
+			System.out.println("Not able to prepare insert statement");
+			e.printStackTrace();
+		}
+		int rc = 0;
+		try {
+			rc  = prepstm.executeUpdate();
+			System.out.println("Return code of insert is   :" + rc);
+		} catch (SQLException e) {
+			System.out.println("Not able to execute inset successfully");
+			e.printStackTrace();
+		}
+		
+		if (rc > 0){
+			request.getSession().setAttribute("returncode", "pass");
+		}else{
+			request.getSession().setAttribute("returncode", "fail");
+		}
+		distpatch.forward(request, response);
+		
+	}
+
+}

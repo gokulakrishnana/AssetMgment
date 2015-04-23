@@ -1,0 +1,156 @@
+package org.gk.assetmgment.servlet;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.jasper.tagplugins.jstl.core.Set;
+
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.Statement;
+
+@WebServlet(
+		description = "Gets Assets not having any deed", 
+		urlPatterns = { 
+				"/GetFreeAssets", 
+				"/getfreeassets"
+		})
+public class GetFreeAssets extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//HashMap<Integer,String> assetDetails = new HashMap<Integer,String>();
+		//assetDetails =getFreeAsset();
+		//request.getSession().setAttribute("freeasset", assetDetails);
+		//RequestDispatcher dispatch = request.getRequestDispatcher("LeaseAddSrc.jsp");
+		//dispatch.forward(request, response);
+		
+		List FreeAssetList = new ArrayList<String>();
+		FreeAssetList =getFreeAssetList();
+		request.getSession().setAttribute("freeasset", FreeAssetList);
+		RequestDispatcher dispatch = request.getRequestDispatcher("LeaseAddSrc.jsp");
+		dispatch.forward(request, response);
+		
+		
+/*		PrintWriter print = response.getWriter();
+  		java.util.Set keyset =  assetDetails.keySet(); 
+		java.util.Iterator ir = keyset.iterator();
+		while (ir.hasNext())
+		{
+			print.println(assetDetails.get(ir.next()));
+		}
+*/	
+		
+	}
+	
+	
+	/*
+	 *  This method gets the assets details not tied to any active lease deed.
+	 */
+	public HashMap<Integer,String> getFreeAsset(){
+
+		HashMap<Integer,String> freeasset = new HashMap<Integer,String>();	
+		String driver = "com.mysql.jdbc.Driver";
+	    String url = "jdbc:mysql://localhost/test_assetmgnt";
+	    String User = "root";
+	    String Password = "";
+	    ResultSet rs;
+	    int testkey = 0;
+	    
+	    String getfreeassets = "(SELECT B.ASSETID ,B.ASSETNAME,B.ASSETST,B.ASSETUNIT "
+	    		+ "FROM assetdeedref A, assetdetails B "
+	    		+ "WHERE A.DEEDID NOT IN "
+	    		+ "(SELECT C.DEEDID FROM leasedeed C "
+	    		+ "WHERE C.STATUS = 'O' or ( C.ENDDATE >= CURRENT_DATE AND C.TERMDATE >= CURRENT_DATE) )"
+	    		+ " AND A.ASSETID= B.ASSETID)"
+	    		+ "UNION"
+	    		+ "(SELECT B.ASSETID ,B.ASSETNAME,B.ASSETST,B.ASSETUNIT "
+	    		+ "FROM assetdetails B "
+	    		+ "WHERE B.ASSETID NOT IN "
+	    		+ "(SELECT A.ASSETID FROM assetdeedref A)"
+	    		+ ")";
+	    try {
+			Class.forName(driver);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} 
+	    
+	    try {
+			Connection conn =(Connection) DriverManager.getConnection(url,User,Password);
+			Statement stmt = (Statement) conn.createStatement();
+			rs= stmt.executeQuery(getfreeassets);
+			while(rs.next()){
+				int keyvalue = rs.getInt(1);
+				testkey = keyvalue; 
+				String mapvalue = rs.getString(2) + "," + rs.getString(3)+ "," + rs.getInt(4);
+				freeasset.put(keyvalue, mapvalue);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return freeasset;
+	}
+	/*
+	 *  This method gets the assets details not tied to any active lease deed and retunr in a List
+	 */
+	public ArrayList getFreeAssetList(){
+
+		List FreeAssetList = new ArrayList();
+		String driver = "com.mysql.jdbc.Driver";
+	    String url = "jdbc:mysql://localhost/test_assetmgnt";
+	    String User = "root";
+	    String Password = "";
+	    ResultSet rs;
+	    int testkey = 0;
+	    
+	    String getfreeassets = "(SELECT B.ASSETID ,B.ASSETNAME,B.ASSETST,B.ASSETUNIT "
+	    		+ "FROM assetdeedref A, assetdetails B "
+	    		+ "WHERE A.DEEDID NOT IN "
+	    		+ "(SELECT C.DEEDID FROM leasedeed C "
+	    		+ "WHERE C.STATUS = 'O' or ( C.ENDDATE >= CURRENT_DATE AND C.TERMDATE >= CURRENT_DATE) )"
+	    		+ " AND A.ASSETID= B.ASSETID)"
+	    		+ "UNION"
+	    		+ "(SELECT B.ASSETID ,B.ASSETNAME,B.ASSETST,B.ASSETUNIT "
+	    		+ "FROM assetdetails B "
+	    		+ "WHERE B.ASSETID NOT IN "
+	    		+ "(SELECT A.ASSETID FROM assetdeedref A)"
+	    		+ ")";
+	    try {
+			Class.forName(driver);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} 
+	    
+	    try {
+			Connection conn =(Connection) DriverManager.getConnection(url,User,Password);
+			Statement stmt = (Statement) conn.createStatement();
+			rs= stmt.executeQuery(getfreeassets);
+			while(rs.next()){
+				String mapvalue = rs.getInt(1)+ "," + rs.getString(2) + "," + rs.getString(3)+ "," + rs.getInt(4);
+				FreeAssetList.add(mapvalue);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return (ArrayList) FreeAssetList;
+	}
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+}

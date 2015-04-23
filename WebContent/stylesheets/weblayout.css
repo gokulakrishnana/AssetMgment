@@ -1,0 +1,34 @@
+#header {
+    background-color:#844DF2;
+    color:white;
+    text-align:center;
+    padding:5px;
+	font-style: italic;
+	text-align:center
+}
+
+#section {
+    width:60%;   
+    height:450px; 
+    float:left;
+    padding:10px;
+    padding-left:50px;
+    overflow:scroll;	 	 
+}
+#arti{
+	width:20%;
+	float:left;
+    padding:10px;  	 	 
+}
+#end {
+    background-color:#844DF2;
+    color:white;
+    clear:both; 
+    text-align:center;
+   	padding:5px;	 	 
+}
+
+.td_span_center {
+text-align :center;
+background-color:#844DF2;
+}
